@@ -12,16 +12,16 @@ tags:
 
 现在有一个"abcaaba"的字符串（主串），需要在其中查找（匹配）一个"aba"的子串（模式串）第一次出现的位置，那么我们可以想到如下方法：
 
-<p style="text-align: center;">![p1]
+<center>![p1]</center>
 
 如图，我们发现在第一次匹配时最后模式串中最后一个字符'a'和主串中对应字符'c'不同，说明不匹配，还需要进行查找。为了不漏过任意一个字串，我们谨慎地将模式串向右移动一位，再次进行匹配：
 <!-- more -->
 
-<p style="text-align: center;">![p2]
+<center>![p2]</center>
 
 这次似乎更不走运了，第一个字符就不相同。我们需要再将模式串向右移动一位，继续匹配，直到：
 
-<p style="text-align: center;">![p3]
+<center>![p3]</center>
 
 哈，我们终于找到了它出现的位置。先别急着休息，我们先来回顾一下我们的方法吧。
 
@@ -29,17 +29,17 @@ tags:
 
 这个方法比较关键的一点在于，每次匹配失败后就要把模式串右移一位再重新比较。也许这时候你已经发现了，在第一次匹配的时候：
 
-<p style="text-align: center;">![p4]
+<center>![p4]</center>
 
 模式串的前两个字符我们已经比较过发现是相等的了，而且很明显模式串的第二个字符'b'和第一个字符'a'不相等，那么似乎我们应该要想到下一次可以直接跳过主串的第二个字符'b'了：
 
-<p style="text-align: center;">![p5]
+<center>![p5]</center>
 
 或许这里我举的例子还不是很直观，我们不妨设想一下假如是"abbbabbbc"的主串和"abbbc"的模式串，采用这种方法我们一下子就可以跳过三个字符'b'！
 
 
-[p1]:字符串的KMP匹配算法/1.png "普通第一次匹配"
-[p2]:字符串的KMP匹配算法/2.png "普通第二次匹配"
-[p3]:字符串的KMP匹配算法/3.png "普通最后一次匹配"
-[p4]:字符串的KMP匹配算法/4.png "普通第一次匹配2"
-[p5]:字符串的KMP匹配算法/5.png "普通第二次匹配2"
+[p1]:http://ol98d2692.bkt.clouddn.com/%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84KMP%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/1.png "普通第一次匹配"
+[p2]:http://ol98d2692.bkt.clouddn.com/%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84KMP%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/2.png "普通第二次匹配"
+[p3]:http://ol98d2692.bkt.clouddn.com/%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84KMP%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/3.png "普通最后一次匹配"
+[p4]:http://ol98d2692.bkt.clouddn.com/%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84KMP%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/4.png "普通第一次匹配2"
+[p5]:http://ol98d2692.bkt.clouddn.com/%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84KMP%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/5.png "普通第二次匹配2"
