@@ -4,13 +4,118 @@ $ho1_button_color = #000000;
 $ho1_button_border_color = #b0b0b0;
 $ho1_button_border_hover_color = #60daaa;
 
+.container {
+    background-color: #f4f4f4;
+}
 
 .logo-line-before,
 .logo-line-after {
     display: none;
 }
 
+.header {
+    width: 100%;
+    top: 0;
+    right: 0;
+    z-index: 1020;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease-in;
+
+    .header-inner {
+        margin-bottom: 0;
+        padding: 10px 0 10px;
+
+        .site-meta {
+            margin-left: 10px;
+        }
+
+        +desktop() {
+            width: auto;
+            max-width: 700px;
+        }
+    }
+}
+
+.menu {
+    margin-top: 4px;
+
+    .menu-item {
+        margin-left: 20px;
+
+        a {
+            font-size: 15px;
+        }
+    }
+}
+
+.main {
+    margin-top: 80px!important;
+    padding-top: 0;
+    background-color: #f4f4f4;
+}
+
+.container .main-inner {
+    margin-top: 40px;
+    //width: 900px;
+
+    +mobile() {
+        width: auto;
+    }
+    +tablet() {
+        width: 90%;
+    }
+    +desktop() {
+        width: auto;
+        max-width: 1000px;
+    }
+    +desktop-large() {
+        width: 1000px;
+    }
+}
+
+.links-of-author a {
+    padding: 0 5px 0 3px;
+}
+
+.post-body {
+
+    h1::before {
+        content: '§';
+        //font-family: FontAwesome;
+        margin-right: 10px;
+    }
+
+    h2 {
+        border-left: 4px solid #555;
+        margin: 30px -20px 15px -20px;
+        padding: 0 25px!important;
+        background-color: #fbfbfb;
+        line-height: 44px;
+        font-size: 22px;
+        font-weight: normal;
+    }
+
+    h3, h4, h5, h6 {
+        padding-top: 0;
+    }
+
+    p {
+        text-indent: 2em;
+    }
+}
+
 .posts-expand {
+
+    .post {
+        margin-top: 80px;
+    }
+
+    .post-type-normal {
+        padding: 10px 20px;
+        background-color: #fff;
+        box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    }
 
     .post-title,
     .post-meta {
@@ -23,7 +128,9 @@ $ho1_button_border_hover_color = #60daaa;
     }
 
     .post-button {
-        margin-top: 50px;
+        margin-top: 35px;
+        padding-top: 25px;
+        border-top: 2px dashed #e0e0e0;
         text-align: center;
 
         a {
@@ -80,4 +187,8 @@ $ho1_button_border_hover_color = #60daaa;
             transition: height 0.2s ease-out, width 0.2s ease-out 0.2s;
         }
     }
+}
+
+.footer {
+    background-color: #fff;
 }
