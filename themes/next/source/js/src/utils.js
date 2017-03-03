@@ -71,8 +71,6 @@ NexT.utils = NexT.$u = {
       if (pushHeight < 0)
         pushHeight = 0;
 
-      console.log(documentHeight);
-
       var $toggle = $('.sidebar-toggle');
       var $sidebar = $('.sidebar');
       var $top = $('.back-to-top');
