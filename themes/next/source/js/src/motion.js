@@ -77,12 +77,14 @@ $(document).ready(function () {
   sidebarToggleLines.push(sidebarToggleLine2nd);
   sidebarToggleLines.push(sidebarToggleLine3rd);
 
-  var SIDEBAR_WIDTH = '320px';
+  var SIDEBAR_WIDTH = 320;
   var SIDEBAR_DISPLAY_DURATION = 200;
+  var SIDEBAR_TOGGLE_RIGHT = 50;
 
   var sidebarToggleMotion = {
     toggleEl: $('.sidebar-toggle'),
     sidebarEl: $('.sidebar'),
+    topEl: $('.back-to-top'),
     isSidebarVisible: false,
     init: function () {
       this.toggleEl.on('click', this.clickHandler.bind(this));
@@ -120,8 +122,16 @@ $(document).ready(function () {
 
       sidebarToggleLines.close();
 
+      this.toggleEl.velocity('stop').velocity({
+        right: SIDEBAR_WIDTH - SIDEBAR_TOGGLE_RIGHT + 'px'
+      });
+
+      this.topEl.velocity('stop').velocity({
+        right: SIDEBAR_WIDTH - SIDEBAR_TOGGLE_RIGHT + 'px'
+      });
+
       this.sidebarEl.velocity('stop').velocity({
-          width: SIDEBAR_WIDTH
+          width: SIDEBAR_WIDTH + 'px'
         }, {
           display: 'block',
           duration: SIDEBAR_DISPLAY_DURATION,
@@ -149,7 +159,15 @@ $(document).ready(function () {
     hideSidebar: function () {
       NexT.utils.isDesktop() && $('body').velocity('stop').velocity({paddingRight: 0});
       this.sidebarEl.find('.motion-element').velocity('stop').css('display', 'none');
-      this.sidebarEl.velocity('stop').velocity({width: 0}, {display: 'none'});
+      this.sidebarEl.velocity('stop').velocity({ width: 0 }, { display: 'none' });
+      
+      this.toggleEl.velocity('stop').velocity({
+        right: SIDEBAR_TOGGLE_RIGHT + 'px'
+      });
+      
+      this.topEl.velocity('stop').velocity({
+        right: SIDEBAR_TOGGLE_RIGHT + 'px'
+      });
 
       sidebarToggleLines.init();
 

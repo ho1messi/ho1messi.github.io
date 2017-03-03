@@ -53,6 +53,40 @@ NexT.utils = NexT.$u = {
     });
   },
 
+  scrollToBottom: function () {
+    var THRESHOLD = 50;
+    var sidebarToggleBottom = 45;
+    var backToTopBottom = -100;
+    var backToTopOnBottom = 19;
+    var windowHeight = $(window).height();
+
+    $(window).on('scroll', function () {
+      var documentHeight = $(document).height();
+      var footerHeight = $('.footer').outerHeight();
+
+      var pageYOffset = window.pageYOffset;
+      var heightToBottom = documentHeight - windowHeight - pageYOffset;
+      var pushHeight = footerHeight - heightToBottom;
+
+      if (pushHeight < 0)
+        pushHeight = 0;
+
+      console.log(documentHeight);
+
+      var $toggle = $('.sidebar-toggle');
+      var $sidebar = $('.sidebar');
+      var $top = $('.back-to-top');
+
+      $toggle.css('bottom', sidebarToggleBottom + pushHeight + 'px');
+      $sidebar.css('bottom', pushHeight + 'px');
+
+      if (pageYOffset > THRESHOLD)
+        $top.css('bottom', backToTopOnBottom + pushHeight + 'px');
+      else
+        $top.css('bottom', backToTopBottom + 'px');        
+    });    
+  },
+
   /**
    * Transform embedded video to support responsive layout.
    * @see http://toddmotto.com/fluid-and-responsive-youtube-and-vimeo-videos-with-fluidvids-js/

@@ -1,11 +1,18 @@
 // Custom styles.
 
+$ho1_contianer_background_color = #f4f4f4;
+$ho1_header_background_color = #ffffff;
+$ho1_menu_item_color = #60daaa;
 $ho1_button_color = #000000;
 $ho1_button_border_color = #b0b0b0;
 $ho1_button_border_hover_color = #60daaa;
+$ho1_sidebar_background_color = #f8f8f8;
+$ho1_sidebar_toggle_line_background_color = #ffffff;
+$ho1_sidebar_toggle_line_background_hover_color = #60daaa;
+$ho1_back_to_top_hover_color = #60daaa;
 
 .container {
-    background-color: #f4f4f4;
+    background-color: $ho1_contianer_background_color;
 }
 
 .logo-line-before,
@@ -15,10 +22,11 @@ $ho1_button_border_hover_color = #60daaa;
 
 .header {
     width: 100%;
+    position: fixed;
     top: 0;
     right: 0;
     z-index: 1020;
-    background-color: #fff;
+    background-color: $ho1_header_background_color;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease-in;
 
@@ -45,13 +53,19 @@ $ho1_button_border_hover_color = #60daaa;
 
         a {
             font-size: 15px;
+            transition: color 0.2s ease-in-out 0.0s;
         }
+    }
+
+    .menu-item a:hover {
+        background: none;
+        color: $ho1_menu_item_color;
     }
 }
 
 .main {
-    margin-top: 80px!important;
-    padding-top: 0;
+    margin-top: 0!important;
+    padding-top: 80px;
     background-color: #f4f4f4;
 }
 
@@ -145,6 +159,7 @@ $ho1_button_border_hover_color = #60daaa;
             box-sizing: border-box;
             box-shadow: inset 0 0 0 1px $ho1_button_border_color;
             position: relative;
+            padding-left: 12px;
         }
 
         .btn::before, .btn::after {
@@ -187,6 +202,25 @@ $ho1_button_border_hover_color = #60daaa;
             transition: height 0.2s ease-out, width 0.2s ease-out 0.2s;
         }
     }
+}
+
+.sidebar {
+    //background-color: $ho1_sidebar_background_color;
+    //box-shadow: none;
+}
+
+.page-post-detail .sidebar-toggle-line {
+    background-color: $ho1_sidebar_toggle_line_background_color;
+}
+
+.sidebar-toggle:hover {
+    .sidebar-toggle-line {
+        background-color: $ho1_sidebar_toggle_line_background_hover_color;
+    }
+}
+
+.back-to-top:hover {
+    color: $ho1_back_to_top_hover_color;
 }
 
 .footer {
