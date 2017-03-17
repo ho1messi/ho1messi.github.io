@@ -1,0 +1,15 @@
+<div id="main-col" class="alignleft">
+  <div id="wrapper">
+
+    <% page.posts.each(function(item){ %>
+      <%- partial('_partial/article', {item: item, index: true}) %>
+    <% }); %>
+
+    <%- partial('_partial/pagination') %>
+    
+  </div>
+</div>
+
+<aside id="sidebar" class="alignright">
+  <%- partial('_partial/sidebar') %>
+</aside>

@@ -63,8 +63,17 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
-#theme: yilia
+theme: concise
+
+#RSS
+plugin:
+- hexo-generator-feed
+#Feed Atom
+feed:
+type: atom
+path: /atom.xml
+limit: 20
+rss: /atom.xml
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html

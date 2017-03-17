@@ -1,0 +1,22 @@
+<script src=" <%- url_for( 'lib/jquery-3.1.1.min.js' ) %> "></script>
+<script src=" <%- url_for( 'js/util.js' ) %> "></script>
+<script src=" <%- url_for( 'js/toc.js' ) %> "></script>
+<script src=" <%- url_for( 'js/sidebar.js' ) %> "></script>
+
+<% if (config.disqus_shortname){ %>
+<script type="text/javascript">
+var disqus_shortname = '<%= config.disqus_shortname %>';
+
+(function(){
+
+alert('aa');
+  var dsq = document.createElement('script');
+  dsq.type = 'text/javascript';
+  dsq.async = true;
+  dsq.src = '//' + disqus_shortname + '.disqus.com/<% if (page.comments){ %>embed.js<% } else { %>count.js<% } %>';
+  (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+}());
+
+</script>
+<% } %>
+
