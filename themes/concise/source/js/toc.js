@@ -27,34 +27,45 @@ if ($toc.length) {
         windowBottomScroll = windowScroll + $(window).height();
         tocBottomAtWindowBottom = windowBottomScroll - $toc.height();
         tocTopAtWindowTop = windowScroll + SPACING_TOP;
-        tocBottomAtFooterTop = $(footer).offset().top - SPACING_BOTTOM;
+        tocBottomAtFooterTop = $(footer).offset().top - SPACING_BOTTOM;     
+        
+        if ($toc.height() > $(window).height()) {
 
-        if (windowScroll > windowScrollLast) {
-            if (tocBottomAtWindowBottom > $toc.offset().top) {
-                if (windowBottomScroll > tocBottomAtFooterTop) {
-                    //$toc.css({ 'top': tocBottomAtFooterTop - tocBaseOffsetBottom });
-                    TocPositionSet(tocBottomAtFooterTop - tocBaseOffsetBottom);
+            if (windowScroll > windowScrollLast) {
+                if (tocBottomAtWindowBottom > $toc.offset().top) {
+                    if (windowBottomScroll > tocBottomAtFooterTop) {
+                        TocPositionSet(tocBottomAtFooterTop - tocBaseOffsetBottom);
+                    } else {
+                        TocPositionSet(windowBottomScroll - tocBaseOffsetBottom);
+                    }
+                } else if (tocBottomAtWindowBottom < tocBaseOffsetTop) {
+                    TocPositionSet(0);
                 } else {
-                    //$toc.css({ 'top': windowBottomScroll - tocBaseOffsetBottom });
-                    TocPositionSet(windowBottomScroll - tocBaseOffsetBottom);
+                    TocPositionSet($toc.offset().top - tocBaseOffsetTop);
                 }
-            } else if (tocBottomAtWindowBottom < tocBaseOffsetTop) {
-                //$toc.css({ 'top': 0 });
-                    TocPositionSet(0);
             } else {
-                TocPositionSet($toc.offset().top - tocBaseOffsetTop);
-            }
-        } else {
-            if (tocTopAtWindowTop < tocBaseOffsetTop) {
-                //$toc.css({ 'top': 0 });
+                if (tocTopAtWindowTop < tocBaseOffsetTop) {
                     TocPositionSet(0);
-            } else if (tocTopAtWindowTop < $toc.offset().top) {
-                //$toc.css({ 'top': tocTopAtWindowTop - tocBaseOffsetTop });
+                } else if (tocTopAtWindowTop < $toc.offset().top) {
                     TocPositionSet(tocTopAtWindowTop - tocBaseOffsetTop);
+                } else {
+                    TocPositionSet($toc.offset().top - tocBaseOffsetTop);
+                }
+            }
+
+        } else {
+
+            if (tocTopAtWindowTop < tocBaseOffsetTop) {
+                TocPositionSet(0);
+            } else if (tocTopAtWindowTop > tocBaseOffsetTop) {
+                TocPositionSet(tocTopAtWindowTop - tocBaseOffsetTop);
             } else {
                 TocPositionSet($toc.offset().top - tocBaseOffsetTop);
             }
+
         }
+
+        
 
         windowScrollLast = windowScroll;
     }
@@ -64,7 +75,6 @@ if ($toc.length) {
         
         if (!$tocActive.length) {
             $toc.css({ 'top': topPosition });
-            console.log(1);
             return;
         }
 
@@ -80,29 +90,14 @@ if ($toc.length) {
             $toc.css({ 'top': topPosition });
         }
     }
-/*
-    function TocWidth() {
-        var tocWidth = {
-            'width': $content.innerWidth() - $article.width() - 30
-        };
-        var tocMargin = {
-            'margin-left': $article.width() + 30
-        };
-        $toc.css(tocMargin);
-    };
-*/
+
     $(document).ready(function () {
         TocPosition();
-        //TocWidth();
     });
 
     $(window).scroll(function () {
         TocPosition();
-    });/*
-    $(window).resize(function () {
-        TocWidth();
     });
-*/
 }
 
 var HEADERFIX = 30;

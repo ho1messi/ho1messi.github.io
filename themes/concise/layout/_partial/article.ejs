@@ -1,6 +1,6 @@
 <article id="article" class="<%= item.layout %>">
   <div class="post-content">
-    <header>
+    <header class="post-header">
       <%- partial('post/title') %>
       <% if (item.layout != 'page'){ %>
         <time datetime="<%= item.date.toDate().toISOString() %>"><%= item.date.format(config.date_format) %></time>
