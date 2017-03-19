@@ -7,6 +7,8 @@ widgets:
 - tagcloud
 - category
 
+favicon: favicon-lightbulb-o.ico
+
 excerpt_link: Read More ›
 
 twitter:
