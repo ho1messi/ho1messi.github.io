@@ -1,0 +1,7 @@
+about: /about
+
+RSS: /atom.xml
+
+vendors:
+
+  _internal: lib

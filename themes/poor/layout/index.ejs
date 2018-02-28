@@ -1,0 +1,44 @@
+<div class="index-content">
+
+  <div class="index-header">
+    <% if (is_category()) { %>
+      <div class="archive-name"><%= page.category %></div>
+    <% } %>
+    <% if (is_tag()) { %>
+      <div class="archive-name"><%= page.tag %></div>
+    <% } %>
+  </div>
+
+  <div class="index-body">
+    <% var last = null %>
+    <% page.posts.each(function(post) { %>
+      <% var year = post.date.year(); %>
+      <% if (last != year) { %>
+        <div class="archive-year">
+          <a href="<%- url_for(config.archive_dir + '/' + year) %>"><%= year %></a>
+        </div>
+      <% } %>
+      <div class="archive-item">
+        <a href="<%- url_for(post.path) %>">
+          <time class="archive-date"><%= date(post.date, 'MM-DD') %></time>
+          <span class="post-title"><%= post.title %></span>
+        </a>
+      </div>
+      <% last = year %>
+    <% }) %>
+
+  </div>
+
+  <% if (page.total > 1) { %>
+    <nav class="paginition" id="page-nav">
+      <span class="paginition-body">
+        <%- paginator({
+          mid_size: 3,
+          prev_text: "<",
+          next_text: ">"
+        }) %>
+      </span>
+    </nav>
+  <% } %>
+
+</div>

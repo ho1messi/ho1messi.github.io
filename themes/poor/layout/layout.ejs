@@ -1,0 +1,54 @@
+<!doctype html>
+
+<html lang="<%= config.language %>">
+
+  <head>
+    <meta charset="utf-8" />
+    <title><%= config.title %></title>
+
+    <link rel="stylesheet" href="<%- url_for(theme.vendors._internal + '/highlight.js/styles/vs.css') %>">
+    <script src="<%- url_for(theme.vendors._internal + '/highlight.js/highlight.pack.js') %>"></script>
+
+    <%- css('css/main') %>
+  </head>
+
+  <body>
+
+    <header class='header'>
+      <div class='meta auto-width'>
+        <span class='title-span'>
+          <a class='title' href="<%- url_for() %>">
+            <%= config.title %>
+          </a>
+        </span>
+        <nav class='main-nav'>
+          <ul>
+            <li>
+              <a class='about' href="<%= theme.about %>">
+                关于
+              </a>
+            </li>
+            <li>
+              <a class='rss' href="<%= theme.RSS %>">
+                订阅
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="header-line"></div>
+    </header>
+
+    <main>
+
+      <div class="content auto-width">
+        <%- body %>
+      </div>
+
+    </main>
+
+  </body>
+
+  <script>hljs.initHighlightingOnLoad();</script>
+
+</html>

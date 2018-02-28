@@ -1,0 +1,11 @@
+<article>
+  <div><%= page.title %></div>
+  <div>
+    <% if (page.categories) { %>
+      <% page.categories.each(function(category) { %>
+        <a href="<%- url_for(category.path) %>"><%= category.name %></a>
+      <% }) %>
+    <% } %>
+  </div>
+  <div class="abs"><%- page.content %></div>
+</article>

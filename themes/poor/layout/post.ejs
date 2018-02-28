@@ -1,0 +1,30 @@
+<div class="post-content">
+
+  <% if (page.title) { %>
+    <article>
+      <div class="article-header">
+        <div class="article-title"><%= page.title %></div>
+        <div class="article-meta">
+          <span class="article-date"><%= date(page.date, 'YYYY-MM-DD') %></span>
+          <% if (page.categories) { %>
+            <% page.categories.each(function(category) { %>
+              <span class="article-category"><a href="<%- url_for(category.path) %>"><%= category.name %></a></span>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="article-content"><%- page.content %></div>
+      <div class="article-tag-list">
+        <% if (page.tags) { %>
+          <% page.tags.each(function(tag) { %>
+            <a class="post-tag" href="<%- url_for(tag.path) %>">#<%= tag.name %></a>
+          <% }) %>
+        <% } %>
+      </div>
+    </article>
+  <% } else { %>
+    <%- partial('about') %>
+  <% } %>
+
+</div>
