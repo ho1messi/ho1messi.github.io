@@ -1,8 +1,10 @@
 ---
 title: C++ inline 关键字学习笔记（一）
 date: 2018-05-24 10:43:04
-categories: 
+categories: C++
 tags: 
+    - C++ 
+    - inline
 ---
 
 ## 初探 inline
@@ -11,31 +13,28 @@ tags:
 
 代码结构大致如下：
 
-```c
+    // A.h
+    class A
+    {
+    public:
+        inline void function() const;
+    };
 
-// A.h
-class A
-{
-public:
-    inline void function() const;
-};
+    // A.cpp
+    void A::function() const
+    {
+        std::cout << "inline test function" << std::endl;
+    }
 
-// A.cpp
-void A::function() const
-{
-    std::cout << "inline test function" << std::endl;
-}
+    // main.cpp
+    int main()
+    {
+        A a;
+        a.function();
+        
+        return 0;
+    }
 
-// main.cpp
-int main()
-{
-    A a;
-    a.function();
-    
-    return 0;
-}
-
-```
 
 报错如下：
 > error LNK2019: 无法解析的外部符号 "public: void __thiscall A::function(void)" (?function@A@@QAEXXZ)，该符号在函数 _main 中被引用
@@ -51,53 +50,43 @@ int main()
 ## 其他尝试
 
 1. 首先怀疑是否是因为函数声明时加了关键字 inline，而定义时未加而导致的报错，于是在函数定义处也加上相同的 inline 关键字：
-
-    ```c
-    
-    // A.cpp
-    inline void A::function() const
-    {
-    
-    ```
+ 
+        // A.cpp
+        inline void A::function() const
+        {
     
     > error LNK2019: 无法解析的外部符号 "public: void __thiscall A::function(void)const " (?function@A@@QBEXXZ)，该符号在函数 _main 中被引用
 
     依然是同样的错误，也就是说在函数定义时无论加不加 inline 关键字都是一样的。
 
 2. 反过来，在函数定义时加上 inline，而在函数声明出不加的话，也依然是同样的错误。
-
-    ```c
     
-    // A.h
-    class A
-    {
-    public:
-        void function() const;
-    };
-    
-    // A.cpp
-    inline void A::function() const
-    {
-    
-    ```
+        // A.h
+        class A
+        {
+        public:
+            void function() const;
+        };
+        
+        // A.cpp
+        inline void A::function() const
+        {
     
     > error LNK2019: 无法解析的外部符号 "public: void __thiscall A::function(void)const " (?function@A@@QBEXXZ)，该符号在函数 _main 中被引用
 
 3. 如果将函数的定义和声明一起写到 A.h 文件中，这个错误就不报了。
-
-    ```c
     
-    // A.h
-    class A
-    {
-    public:
-        inline void function() const
+        // A.h
+        class A
         {
-            std::cout << "inline test function" << std::endl;
-        }
-    };
+        public:
+            inline void function() const
+            {
+                std::cout << "inline test function" << std::endl;
+            }
+        };
 
-    ```
+    > inline test function
 
 ## inline 原理分析
 
@@ -133,23 +122,19 @@ int main()
 
 如果确实是在前三个步骤中处理的 inline，那么就意味着 inline 函数的定义只能是在当前的源文件中，因为编译的三个步骤都只是针对某个单独的源文件本身的，并不会再去其他源文件中寻找定义。这似乎也非常符合目前的情况，只有第 3 次尝试中源文件中包含了定义，也只有这次没有报错。为了这一点，只需要将原本 A.cpp 中的定义转移到 main.cpp 中：
 
-```c
+    // main.cpp
+    void A::function() const
+    {
+        std::cout << "inline test function" << std::endl;
+    }
 
-// main.cpp
-void A::function() const
-{
-    std::cout << "inline test function" << std::endl;
-}
+    int main()
+    {
+        A a;
+        a.function();
 
-int main()
-{
-    A a;
-    a.function();
-
-    return 0;
-}
-
-```
+        return 0;
+    }
 
 最终输出为：
 
@@ -157,28 +142,24 @@ int main()
 
 更进一步的话，如果之前的假设成立，那么应该还会出现这样的情况：main.cpp 和 A.cpp 中都有 A::function 函数的定义，如果不报重复定义的错的话，真正执行时应该会使用 main.cpp 中的定义：
 
-```c
+    // A.h
+    class A
+    {
+    public:
+        inline void function() const;
+    }
 
-// A.h
-class A
-{
-public:
-    inline void function() const;
-}
+    // A.cpp
+    void A::function() const
+    {
+        std::cout << "inline test function in A.cpp" << std::endl;
+    }
 
-// A.cpp
-void A::function() const
-{
-    std::cout << "inline test function in A.cpp" << std::endl;
-}
-
-// main.cpp
-void A::function() const
-{
-    std::cout << "inline test function in main.cpp" << std::endl;
-}
-
-```
+    // main.cpp
+    void A::function() const
+    {
+        std::cout << "inline test function in main.cpp" << std::endl;
+    }
 
 最终输出结果为：
 
