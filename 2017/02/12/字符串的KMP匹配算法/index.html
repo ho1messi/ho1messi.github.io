@@ -1,0 +1,140 @@
+<!doctype html>
+
+<html lang="zh-Hans">
+
+  <head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <title>Ho1胡思乱想</title>
+
+    <link rel="stylesheet" href="/lib/highlight.js/styles/vs.css">
+    <script src="/lib/highlight.js/highlight.pack.js"></script>
+
+    <link rel="stylesheet" href="/css/main.css">
+  </head>
+
+  <body>
+
+    <header class="header">
+      <div class="meta auto-width">
+        <span class="title-span">
+          <a class="title" href="/">
+            Ho1胡思乱想
+          </a>
+        </span>
+        <nav class="main-nav">
+          <ul>
+            <li>
+              <a class="about" href="/about">
+                关于
+              </a>
+            </li>
+            <li>
+              <a class="rss" href="/atom.xml">
+                订阅
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="header-line"></div>
+    </header>
+
+    <main>
+
+      <div class="content auto-width">
+        <div class="post-content">
+
+  
+    <article>
+      <div class="article-header">
+        <div class="article-title">字符串的KMP匹配算法</div>
+        <div class="article-meta">
+          <span class="article-date">2017-02-12</span>
+          
+            
+              <span class="article-category"><a href="/categories/数据结构/">数据结构</a></span>
+            
+          
+        </div>
+      </div>
+
+      <div class="article-content"><p>在一个主串长为m，模式串长为n的匹配问题中，采用简单的匹配算法有着O(m * n)的时间复杂度。但是其中存在部分字符重复匹配。如果我们能够有效减少其中的重复匹配的现象，便能够将时间复杂度降低到O(m + n)，这无疑对提高模式匹配的速度十分有效。本文以考研复习时对《数据结构》一书中相关介绍的理解为主，添加一些实例，旨在日后自己忘记能更快回忆起并理解，同时也供路过网友参考。<br><a id="more"></a></p>
+<h2 id="普通匹配算法引起的思考"><a href="#普通匹配算法引起的思考" class="headerlink" title="普通匹配算法引起的思考"></a>普通匹配算法引起的思考</h2><h3 id="普通匹配算法"><a href="#普通匹配算法" class="headerlink" title="普通匹配算法"></a>普通匹配算法</h3><p>现在有一个”abcaaba”的字符串（主串），需要在其中查找（匹配）一个”aba”的子串（模式串）第一次出现的位置，那么我们可以想到如下方法：</p>
+<center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/1.png" alt="p1" title="普通第一次匹配"></center>
+
+<p>如图，我们发现在第一次匹配时模式串中最后一个字符’a’和主串中对应字符’c’不同，说明不匹配，还需要进行查找。为了不漏过任意一个字串，我们谨慎地将模式串向右移动一位，再次进行匹配：</p>
+<center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/2.png" alt="p2" title="普通第二次匹配"></center>
+
+<p>这次似乎更不走运了，第一个字符就不相同。我们需要再将模式串向右移动一个字符，继续匹配，直到：</p>
+<center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/3.png" alt="p3" title="普通最后一次匹配"></center>
+
+<p>哈，我们终于找到了它出现的位置。不过先别急着休息，我们先来回顾一下我们的方法吧。</p>
+<p>在每一次匹配中，我们从模式串的第一个字符起，一个一个地向后比较，直到出现不同的字符或者比较完所有字符。若是比较完所有字符都相等那当然是说明我们找到了模式串的位置，若是出现了不同的字符，那么很遗憾，我们还需要将模式串向右移一位重新比较。</p>
+<h3 id="对于特殊例子的改进"><a href="#对于特殊例子的改进" class="headerlink" title="对于特殊例子的改进"></a>对于特殊例子的改进</h3><p>这个方法比较关键的一点在于，每次匹配失败后就要把模式串右移一位再重新比较。我们来详细研究一下第一次匹配：</p>
+<center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/4.png" alt="p4" title="普通第一次匹配2"></center>
+
+<p>毫无疑问主串和模式串的前两个字符完全相等，作为智慧生物我们可以一眼就看出来的。接下来我们在这里停住，做一点点小的推导：</p>
+<blockquote>
+<p>我们设主串的字符分别为S1、S2、…、Sm，模式串的字符则为T1、T2、…、Tn。由第一次匹配我们得到的结果是 S1 = T1、S2 = T2，同时我们观察模式串的前两个字符，很明显可以得到 T1 != T2（此处的 != 为不等于），那么结合一下我们就能得到 T1 != S2。</p>
+</blockquote>
+<p>等等，是不是觉得这个结果有点熟悉。对了，这正是我们第二次匹配的结果！</p>
+<center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/2.png" alt="p2" title="普通第二次匹配"></center>
+
+<p>这么说来只要加上简单的判断，我们就能减少许多像这样的匹配了。不过先别急，我们这里遇到的似乎只是一个特殊的情况，要让我们死板的计算机朋友也和我们这样取巧的话我们还需要找出一种更一般的方法。</p>
+<h2 id="KMP匹配算法"><a href="#KMP匹配算法" class="headerlink" title="KMP匹配算法"></a>KMP匹配算法</h2><h3 id="寻找通用的方法"><a href="#寻找通用的方法" class="headerlink" title="寻找通用的方法"></a>寻找通用的方法</h3><p>打个比方说，假如我们有一个表（不妨叫做next表），能告诉计算机在模式串某一位的匹配中失败应该跳过下面的几次匹配，比如我们这个例子中就跳过了一次。或者采用更形象的描述，我们的模式串相对于主串向右多滑动了几个字符。因为按照我们上面的推导，似乎这个表里的数值只和模式串本身有关，那么我们便有信心使用某种算法在匹配之前就将这样的next表给计算出来，一次计算便可以造福后面的所有匹配。</p>
+<center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/1.png" alt="p1" title="普通第一次匹配"> <img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/5.png" alt="p5" title="普通第二次匹配2"></center>
+
+<p>也就是说，只要我们有了这个next表，后面的匹配过程就能很轻易地实现了，我们就能很轻易地跳过很多次匹配了。我们只需要按照普通的方法那样匹配，唯一不同的在于，如果出现不匹配，我们不是“无脑”地将模式串向右滑动一个字符，而是借助一个next表“机智”地尽可能向右多滑动几个字符，以尽量减少计算机朋友判断的次数。</p>
+<p>按照这个思路，我们可以很轻易写出对应的C语言代码：</p>
+<pre><code>// S为主串，T为模式串，pos为从主串的第几位开始匹配
+// 下标都从1开始
+int Index_KMP(SString S, SString T, int pos)
+{
+    // i为主串待匹配的字符位，j为模式串待匹配的字符位
+    int i = pos, j = 1;
+    // 下标0存储串的长度
+    while (i &lt;= S[0] &amp;&amp; j &lt;= T[0])
+    {
+        if (j == 0 || S[i] == T[j])
+        {
+            ++i;
+            ++j;
+        }
+        else
+        {
+            // next为参考的表，计算方法在后文
+            j = next[j];
+        }
+    }
+    // 匹配到模式串的最后则说明匹配成功
+    if (j &gt; T[0])
+        return i - T[0];
+    else
+        return 0;
+}
+</code></pre><p>这段代码是《数据结构》课本中的，有关的数据类型定义也能在书中找到。</p>
+<p>现在看来似乎一切都很美好，唯一剩下的问题就是next表的计算了。</p>
+<h3 id="计算next表"><a href="#计算next表" class="headerlink" title="计算next表"></a>计算next表</h3></div>
+      <div class="article-tag-list">
+        
+          
+            <a class="post-tag" href="/tags/数据结构/">#数据结构</a>
+          
+            <a class="post-tag" href="/tags/字符串/">#字符串</a>
+          
+        
+      </div>
+    </article>
+  
+
+</div>
+
+      </div>
+
+    </main>
+
+  </body>
+
+  <script>hljs.initHighlightingOnLoad();</script>
+
+</html>

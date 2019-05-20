@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Ho1胡思乱想</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://ho1messi.github.io/"/>
+  <updated>2019-05-20T10:12:58.117Z</updated>
+  <id>https://ho1messi.github.io/</id>
+  
+  <author>
+    <name>Ho1messi</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>静态链接与动态链接</title>
+    <link href="https://ho1messi.github.io/2019/05/13/%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5%E4%B8%8E%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5/"/>
+    <id>https://ho1messi.github.io/2019/05/13/静态链接与动态链接/</id>
+    <published>2019-05-13T21:29:18.000Z</published>
+    <updated>2019-05-20T10:12:58.117Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="编译链接那些事"><a href="#编译链接那些事" class="headerlink" title="编译链接那些事"></a>编译链接那些事</h2><p>我们知道，C/C++源文件在编译出可执行文件或者库之前需要经过编译和链接这两个主要步骤。C/C++中把每个源文件当作一个独立的编译单元进行编译，每个源文件都对应编译出一个目标文件，最后需要将所有目标文件都链接到一起成为最终的可执行文件或者库。</p><h3 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h3><p>这里的编译实际上包括了预处理、编译、汇编等步骤。</p><p>预处理过程处理以<code>#</code>开头的宏命令，最常见的便是写在头文件开头的<code>#ifndef XXX</code>条件编译宏和用于包含头文件的<code>#include</code>命令。对于<code>#include</code>命令，预处理过程会将对应的头文件的所有内容直接复制过来，所以为了防止变量重定义需要搭配<code>#ifndef</code>或者<code>#pragma once</code>使用。</p><p>狭义的编译指的是词法分析、语法分析、语义分析、中间代码生成、目标代码生成这些过程，详细内容在编译原理里都有讲。编译的结果主要是汇编代码，经由汇编生成二进制的目标文件。</p><p>C/C++中编译的单元是单个的源文件，也就是说，在一个多文件编写的项目中，我们需要分别编译每个源文件。这样的话在编译某个源文件时该源文件所使用的在其他文件中定义的函数或变量在编译时其实是无法解析的，因为在编译这个文件时并不知道其他文件中的定义是否会出错，或者是否根本就没有定义这些函数或者变量。</p><p>举个例子来说，比如我们有两个源文件<code>a.cpp</code>和<code>b.cpp</code>，<code>a.cpp</code>中定义了一个函数<code>func()</code>而且被<code>b.cpp</code>所使用。那么在编译<code>b.cpp</code>时，编译器实际上是看不到<code>a.cpp</code>的内容的，所以编译器也不知道<code>func()</code>在<code>a.cpp</code>中到底有没有定义，从而无法解析这个符号。</p><h3 id="符号"><a href="#符号" class="headerlink" title="符号"></a>符号</h3><p>为了解决上面提到的无法解析符号的问题，我们需要先明确一下符号的概念。这里的符号是指程序中的函数和全局或静态变量等。</p><p>对于每个源文件编译生成的目标文件，如果想要将自己定义的符号给其他目标文件使用，则必须要告诉对方自己都定义了哪些符号；同时为了使用其他目标文件中定义的符号，也必须记住自己要使用的外部符号。于是在目标文件中需要有一个符号表的结构，里面要保存该源文件中定义的符号以及该源文件中用到的外部符号，这个结构就是符号表。</p><h3 id="链接"><a href="#链接" class="headerlink" title="链接"></a>链接</h3><p>有了符号表以后，我们还需要一次性读取所有的目标文件的符号表，这样才能知道每个符号具体在哪个目标文件中有定义，才能正确地解析每个符号。所以，链接不再是一个一个文件单独处理，而是要一次性将所有的目标文件全都链接到一起。</p><p>下面我们再分函数和变量两种情况来看符号的解析。对于函数而言，函数的参数会直接压入栈中，而调用函数实际上只是相当于执行了一句跳转指令，也就是说只要能够匹配上函数的参数类型，同时明确函数的地址就能正常解析函数的符号；对于变量而言，变量的类型决定了对变量的操作的方式和变量占用的内存大小，所以在明确了变量的地址后也能正确地解析变量符号了。</p><p>在链接的过程中链接器会直接查询所有目标文件的符号表，只要用到的所有符号就能在符号表中找到就能明确符号的地址完成链接了。</p><h3 id="目标文件"><a href="#目标文件" class="headerlink" title="目标文件"></a>目标文件</h3><p>单个的源文件在经过编译器编译后会生成一个对应的二进制的目标文件，那么这个目标文件里面究竟有什么呢？关于目标文件的确切内容比较复杂，而且实际上linux和windows下的目标文件格式也有差异，这里我们以linux下的目标文件为例介绍一下能够帮助我们理解编译链接过程的部分。</p><p>首先，为了能够与其他目标文件链接到一起，需要一个符号表的结构记录下这个目标文件中用到的所有全局符号；其次为了把程序中的数据和代码分开，分别需要一个数据段和代码段。此外，由于有些全局或者静态变量初始化时会是0，所以可以在目标文件中不给这些变量分配空间，只在运行时分配空间，这些初始化为0的变量就单独记录到另一个段里，也就是bss段。</p><p>由于编译时源文件中用到的外部符号的地址是不知道的，所以在编译成机器代码的时候生成的地址并不是这个符号的正确地址，正确的地址必须要到链接的阶段才能被修正，这个过程叫做符号的重定位。为了记录需要重定位的变量和函数，所以数据段和代码段也分别会需要一个重定位段来记录需要进行重定位的变量和函数。</p><h3 id="强符号和弱符号"><a href="#强符号和弱符号" class="headerlink" title="强符号和弱符号"></a>强符号和弱符号</h3><p>进行链接时经常会出现“符号未定义”和“符号重定义”两种错误。“符号未定义”很容易理解，就是用到的某个符号却找不到这个符号的定义；但是“符号重定义”呢？只要是重复定义了同一个符号就算是“重定义”了么？</p><p>这里我们可以做一个实验，创建两个源文件<code>a.c</code>和<code>main.c</code>，源文件内容如下：</p><pre><code>// a.cint global_var = 1;// main.c#include &lt;stdio.h&gt;int global_var;int main() {    printf(&quot;%d\n&quot;, global_var);    return 0;}</code></pre><p>这里我们定义了两次变量<code>global_var</code>，按照我们对“符号重定义”的理解，这应该是属于重定义，应该会报链接错误。输入<code>gcc a.c main.c -o main</code>一次编译和链接，然后……没报错？再输入<code>./main</code>运行程序，程序的输出是<code>1</code>。</p><p>没有出现符号重定义的链接错误，这与我们的推论不一致，那是为什么呢？为了回答这个问题我们得提出强符号和弱符号的概念。C/C++中规定，同名符号中最多只能有一个为强符号，也就是我们之前提到的“符号重定义”错误，但是对于多个弱符号同时存在则没有问题。</p><p>那么哪些是弱符号哪些是强符号呢？简单的规则是，函数和经过初始化的变量为强符号，而未初始化的变量为弱符号。比如<code>a.c</code>中定义的<code>global_var</code>，因为初始化为1所以是强符号，而<code>main.c</code>中的<code>global_var</code>因为没有初始化所以是弱符号，同时只有一个强符号存在所以不会导致“符号重定义”错误。</p><p>在强符号存在的情况下，链接器会采用强符号，那么同时存在多个弱符号的情况下该如何决定用哪个符号呢？这里我们再来做一个试验：</p><pre><code>// a.clong int weak_symbol __attribute__((weak)) = 1;int another_weak_symbol;int strong_symbol = 1;// main.c#include &lt;stdio.h&gt;short int weak_symbol __attribute__((weak)) = 2;int main() {    printf(&quot;%d\n&quot;, weak_symbol);    return 0;}</code></pre><p>这里使用的<code>__attribute__((weak))</code>扩展是告诉gcc编译器强制将一个强符号转换成弱符号，所以这两个文件使用<code>gcc a.c main.c -o main</code>编译链接依然不会报错。然后执行<code>./main</code>运行程序，发现程序的输出是<code>1</code>。</p><p>我们设想一下，在编译<code>main.c</code>时，<code>weak_symbol</code>是一个弱符号，但是编译器并不知道这个弱符号会不会被其他文件中同名的一个强符号所覆盖，所以没办法确定<code>weak_symbol</code>的内存大小。无法确定是否会被强符号覆盖，所以不能把<code>weak_symbol</code>放入<code>bss</code>段中在运行时再分配空间，所以只能在链接的期间决定<code>weak_symbol</code>的内存大小。链接器链接时会读取符号表，但是由于符号表不能保存<code>weak_symbol</code>的类型，所以链接器也无从判断两个源文件中定义的<code>weak_symbol</code>是否类型相同，只能允许多个弱符号的定义存在，并且最终把所有的同名的弱符号链接为占用空间最大的那一个。</p><h3 id="强引用和弱引用"><a href="#强引用和弱引用" class="headerlink" title="强引用和弱引用"></a>强引用和弱引用</h3><p>与符号类似，C/C++中的引用也分为强引用和弱引用。引用指的是对其他源文件中定义的函数或变量的引用。对于变量而言，声明一个引用需要使用<code>extern</code>关键字，表明这是一个对外部变量的引用；而对于函数而言，可以不加<code>extern</code>关键字，函数的声明本身就相当于一个引用。</p><p>定义的引用默认为强引用，如需定义弱引用可以使用编译器的<code>__attribute__((weakref))</code>扩展，比如下面这段代码：</p><pre><code>// main.c__attribute__((weakref)) void foo();int main() {    if (foo) foo();}</code></pre><p>就定义了一个对<code>foo()</code>函数的弱引用。即使没有<code>foo()</code>的定义，这段代码也可以正常编译链接成可执行文件而不报错，因为C/C++允许存在对未定义符号的弱引用，其值默认为0。在<code>main()</code>中，首先判断<code>foo</code>是否被定义，如果链接到的某个库定义了<code>foo()</code>这个函数，则这个弱引用是有效的，其值是<code>foo()</code>函数的地址，是个非0值，所以满足条件能够正常调用<code>foo()</code>；如果不存在<code>foo()</code>的定义，那么此处的弱引用为默认值0，程序则不会执行<code>foo()</code>从而避免运行时报错。</p><p>弱引用的这个特性可以用于运行时判断是否有链接到某个库。比如某个支持多线程的程序，可以定义一个对<code>int pthread_create()</code>函数的弱引用从而判断程序是链接到了单线程还是多线程的Glibc库，从而选择不同的程序逻辑。</p><h2 id="静态链接"><a href="#静态链接" class="headerlink" title="静态链接"></a>静态链接</h2><h3 id="符号解析与重定位"><a href="#符号解析与重定位" class="headerlink" title="符号解析与重定位"></a>符号解析与重定位</h3><p>前面提到过因为在编译时无法确定外部符号的地址，所以需要在链接的时候进行重定位。重定位操作的目的是要计算出符号的真实地址。</p><h3 id="静态库链接"><a href="#静态库链接" class="headerlink" title="静态库链接"></a>静态库链接</h3><h2 id="动态链接"><a href="#动态链接" class="headerlink" title="动态链接"></a>动态链接</h2><h3 id="可执行文件的装载"><a href="#可执行文件的装载" class="headerlink" title="可执行文件的装载"></a>可执行文件的装载</h3><h3 id="进程内存空间分布"><a href="#进程内存空间分布" class="headerlink" title="进程内存空间分布"></a>进程内存空间分布</h3><h3 id="地址无关代码"><a href="#地址无关代码" class="headerlink" title="地址无关代码"></a>地址无关代码</h3><p>库分为静态链接库和动态链接库，区别在于链接的时间。静态链接库会在构建可执行文件时由链接器进行链接，而动态连接器在程序运行时由动态链接器链接。</p><p>静态链接库在linux系统中一般后缀为 <em>.a ，而在windows系统中后缀为 </em>.lib 。静态链接库实际上只是将多个目标文件打包到一起，链接到静态链接库时则是直接寻找依赖的目标文件，把需要的目标文件解压出来再直接链接。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;编译链接那些事&quot;&gt;&lt;a href=&quot;#编译链接那些事&quot; class=&quot;headerlink&quot; title=&quot;编译链接那些事&quot;&gt;&lt;/a&gt;编译链接那些事&lt;/h2&gt;&lt;p&gt;我们知道，C/C++源文件在编译出可执行文件或者库之前需要经过编译和链接这两个主要步骤。C/C++中
+      
+    
+    </summary>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>C++ inline 关键字学习笔记（一）</title>
+    <link href="https://ho1messi.github.io/2018/05/24/C++%20inline%20%E5%85%B3%E9%94%AE%E5%AD%97%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%80%EF%BC%89/"/>
+    <id>https://ho1messi.github.io/2018/05/24/C++ inline 关键字学习笔记（一）/</id>
+    <published>2018-05-24T10:43:04.000Z</published>
+    <updated>2019-05-20T10:12:58.117Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="初探-inline"><a href="#初探-inline" class="headerlink" title="初探 inline"></a>初探 inline</h2><p>最初是在一个工程中，考虑到数个函数需要多次调用，同时程序对性能要求也比较高，所以打算为其加上 inline 关键字以提高效率。但是，在链接的时候遇到了一个函数未编译的错误。</p><p>代码结构大致如下：</p><pre><code>// A.hclass A{public:    inline void function() const;};// A.cppvoid A::function() const{    std::cout &lt;&lt; &quot;inline test function&quot; &lt;&lt; std::endl;}// main.cppint main(){    A a;    a.function();    return 0;}</code></pre><p>报错如下：</p><blockquote><p>error LNK2019: 无法解析的外部符号 “public: void __thiscall A::function(void)” (?function@A@@QAEXXZ)，该符号在函数 _main 中被引用</p></blockquote><p>经过检查，A.cpp 和 main.cpp 都是包含在工程中的，也就是说编译的时候确实是两个文件都编译到了的，但是在编译 main.cpp 的时候却找不到 A::function 这个函数的定义了。</p><h2 id="inline-作用分析"><a href="#inline-作用分析" class="headerlink" title="inline 作用分析"></a>inline 作用分析</h2><p>首先是使用 inline 的目的，当然是为了提高函数的性能。具体些来说，使用 inline 以后可以提高函数调用时的性能，因为使用该关键字以后编译器会尝试把该函数使用类似宏替换的方法替换到需要调用的地方，这样就减少了函数调用时对栈的操作。同时，不同于宏的是，inline 函数在编译时还是作为一个函数，也就是说，编译器还是会去做类型检测，所以相比宏提高了安全性。</p><p>知道了 inline 的大致原理的同时也能直观看出 inline 的一些局限。因为是类似宏展开的方式，对于递归调用的函数当然是无法成功展开的。实际测试中在递归函数前加 inline 关键字也不会报错，所以说这个关键字其实是不一定生效的，换句话说这只是对编译器的一种建议。查阅资料还了解到，函数中如果包含了 while、switch 等复杂的控制语句同样会无法展开。这些是 inline 使用时的限制情况，但这还是无法说明为何在这段代码中会找不到函数定义。</p><h2 id="其他尝试"><a href="#其他尝试" class="headerlink" title="其他尝试"></a>其他尝试</h2><ol><li><p>首先怀疑是否是因为函数声明时加了关键字 inline，而定义时未加而导致的报错，于是在函数定义处也加上相同的 inline 关键字：</p><pre><code>// A.cppinline void A::function() const{</code></pre><blockquote><p>error LNK2019: 无法解析的外部符号 “public: void __thiscall A::function(void)const “ (?function@A@@QBEXXZ)，该符号在函数 _main 中被引用</p></blockquote><p> 依然是同样的错误，也就是说在函数定义时无论加不加 inline 关键字都是一样的。</p></li><li><p>反过来，在函数定义时加上 inline，而在函数声明出不加的话，也依然是同样的错误。</p><pre><code>// A.hclass A{public:    void function() const;};// A.cppinline void A::function() const{</code></pre><blockquote><p>error LNK2019: 无法解析的外部符号 “public: void __thiscall A::function(void)const “ (?function@A@@QBEXXZ)，该符号在函数 _main 中被引用</p></blockquote></li><li><p>如果将函数的定义和声明一起写到 A.h 文件中，这个错误就不报了。</p><pre><code>// A.hclass A{public:    inline void function() const    {        std::cout &lt;&lt; &quot;inline test function&quot; &lt;&lt; std::endl;    }};</code></pre><blockquote><p>inline test function</p></blockquote></li></ol><h2 id="inline-原理分析"><a href="#inline-原理分析" class="headerlink" title="inline 原理分析"></a>inline 原理分析</h2><p>在几次简单尝试后，我们发现首先声明带不带 inline 是不同的，因为第 2 次尝试中 A.h 里不带 inline 的声明和 A.cpp 里带 inline 的定义没有链接到一起；其次，编译器在链接的时候似乎没有去对应的 A.cpp 文件中寻找 function 函数的定义。</p><h3 id="编译过程回顾"><a href="#编译过程回顾" class="headerlink" title="编译过程回顾"></a>编译过程回顾</h3><p>简单回顾一下，编译器在生成 .exe 可执行文件的时候其实是有两个步骤的，分别是编译和链接，而编译又分为预编译、编译和汇编三个阶段：</p><ol><li><p>预编译：<br> 预编译主要是处理 #include 和其他宏，可以将头文件加入到源文件当中，最终生成的文件还是一个文本文件；</p></li><li><p>编译：<br> 编译过程则是将 C++ 代码转换为汇编代码，最终生成的也是一个文本文件；</p></li><li><p>汇编：<br> 汇编过程则是把汇编代码转换成二进制程序，最终生成的是一个二进制文件；</p></li><li><p>链接：<br> 以上编译的三个步骤都是针对的单个源文件，也就是说每个源文件在编译完都会生成一个对应的二进制文件，但是这些文件彼此是孤立的。对于一些函数调用，比如之前例子中 main.cpp 中调用了函数 function()，但是 main.cpp 和包含的 A.h 中都没有该函数的定义，于是就需要链接程序去其他文件中寻找并链接起来。</p></li></ol><p>我们这里报的错误是链接错误，也就是说在之前的三个阶段预编译、编译和汇编都没有问题，只是链接程序在寻找 function 函数的定义的时候出了错。这同时也很好地解释了为什么第 3 次尝试中将函数定义写在头文件中就没有了错误，因为这时候预编译出来的对应 main.cpp 的文件中由于 #include “A.h” 其实已经包含了 function 函数的定义。</p><h3 id="inline-编译过程"><a href="#inline-编译过程" class="headerlink" title="inline 编译过程"></a>inline 编译过程</h3><p>通过以上的分析可以发现其实是 inline 这个关键字导致了链接过程中找不到函数的定义，所以其实只要弄清楚在整个编译链接的过程中对 inline 这个关键字做了怎样的处理就能清楚问题的具体所在了。</p><p>但是，这个地方真正麻烦的事情是，编译器对 inline 关键字的具体策略的影响因素很多，涉及到编译时的优化级别等，而且不同的编译器还存在差别，所以不好去直接探究编译器在编译阶段对 inline 的处理。</p><p>既然如此，只好退而求其次，通过其他办法来寻找出现这个错误的原因了。之前我们提到，第 3 次尝试中因为包含的头文件中直接有 function 函数的定义所以没有报错，而之前的情况中在 A.cpp 中的函数定义都没有被找到，那么这是否意味着对于加了 inline 关键字的函数编译器就不会再去其他源文件里寻找定义了呢？换句话说，inline 函数必须要在预编译、编译或者汇编这三个过程中就链接好并尝试展开，而不会再等到最后的链接过程去处理。这在目前只是一个假设，但是我们还是可以通过分析一些情况来论证这个假设。</p><p>假如说 inline 的处理在最终的链接阶段的话，那么就意味着要对二进制文件进行处理，这样来做无疑是会比直接对文本文件操作难上许多的，因为 inline 需要用类似宏定义的方式展开代码来减少调用，而对于二进制文件一点点插入操作都可能会影响到之后的跳转的地址，这样带来的额外开销是巨大的，所以从实现的角度来考虑其实是有很大的把握不会在链接的过程中再来处理 inline 关键字的。</p><p>如果确实是在前三个步骤中处理的 inline，那么就意味着 inline 函数的定义只能是在当前的源文件中，因为编译的三个步骤都只是针对某个单独的源文件本身的，并不会再去其他源文件中寻找定义。这似乎也非常符合目前的情况，只有第 3 次尝试中源文件中包含了定义，也只有这次没有报错。为了这一点，只需要将原本 A.cpp 中的定义转移到 main.cpp 中：</p><pre><code>// main.cppvoid A::function() const{    std::cout &lt;&lt; &quot;inline test function&quot; &lt;&lt; std::endl;}int main(){    A a;    a.function();    return 0;}</code></pre><p>最终输出为：</p><blockquote><p> inline test function</p></blockquote><p>更进一步的话，如果之前的假设成立，那么应该还会出现这样的情况：main.cpp 和 A.cpp 中都有 A::function 函数的定义，如果不报重复定义的错的话，真正执行时应该会使用 main.cpp 中的定义：</p><pre><code>// A.hclass A{public:    inline void function() const;}// A.cppvoid A::function() const{    std::cout &lt;&lt; &quot;inline test function in A.cpp&quot; &lt;&lt; std::endl;}// main.cppvoid A::function() const{    std::cout &lt;&lt; &quot;inline test function in main.cpp&quot; &lt;&lt; std::endl;}</code></pre><p>最终输出结果为：</p><blockquote><p>inline test function in main.cpp</p></blockquote><p>这个程序确实没有报错，尽管确实在 A.cpp 和 main.cpp 两个文件中都存在一个函数定义，并且这两个函数定义还不同。这说明编译器此时并没有找到另一个定义，或者找到了但不认为这两个是同一个函数的定义。所以，为了解决这一问题，只需要保证在当前 .cpp 文件里能找到 inline 函数的定义就行了。换句话说，将 inline 函数的定义写在有对应声明的 .h 文件就就能保证一定能找到定义了。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>所有测试目前都在 G++ 和 VC++ 中进行。虽然事实上只是部分验证了猜测，但是还是了解到了编译器在编译期间对 inline 关键字的部分的处理方式，并且基于这个方式给出了一种能完全解决问题的方案。虽然就个人来说将函数定义写在 .h 文件中显得有些丑陋，但是考虑到 inline 函数普遍会比较短小所以这件事本身也不是完全无法忍受，所以至此先告一段落。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;初探-inline&quot;&gt;&lt;a href=&quot;#初探-inline&quot; class=&quot;headerlink&quot; title=&quot;初探 inline&quot;&gt;&lt;/a&gt;初探 inline&lt;/h2&gt;&lt;p&gt;最初是在一个工程中，考虑到数个函数需要多次调用，同时程序对性能要求也比较高，所以打算
+      
+    
+    </summary>
+    
+      <category term="C++" scheme="https://ho1messi.github.io/categories/C/"/>
+    
+    
+      <category term="C++" scheme="https://ho1messi.github.io/tags/C/"/>
+    
+      <category term="inline" scheme="https://ho1messi.github.io/tags/inline/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>有趣的网站</title>
+    <link href="https://ho1messi.github.io/2017/02/14/%E6%9C%89%E8%B6%A3%E7%9A%84%E7%BD%91%E7%AB%99/"/>
+    <id>https://ho1messi.github.io/2017/02/14/有趣的网站/</id>
+    <published>2017-02-14T01:47:49.000Z</published>
+    <updated>2019-05-20T10:12:58.117Z</updated>
+    
+    <content type="html"><![CDATA[<p>平时在折腾各种工具的过程中总会发现各种各样有趣的网站（有些可能不一定很实用），有些可能比较冷门，所以特别用一篇文章来把这些网站整理一下，以后有兴趣找的时候可以方便一些。<br><a id="more"></a></p><h2 id="素材"><a href="#素材" class="headerlink" title="素材"></a>素材</h2><h5 id="Font-Awesome-Favicon-Generator"><a href="#Font-Awesome-Favicon-Generator" class="headerlink" title="Font Awesome Favicon Generator"></a><a href="http://paulferrett.com/fontawesome-favicon" target="_blank" rel="noopener">Font Awesome Favicon Generator</a></h5><p>一个能在线生成Font Awesome图标的网站，可以方便地生成喜欢的图标作为网页的图标。</p><h2 id="设计"><a href="#设计" class="headerlink" title="设计"></a>设计</h2><h5 id="Button-Generator"><a href="#Button-Generator" class="headerlink" title="Button Generator"></a><a href="http://www.bestcssbuttongenerator.com/" target="_blank" rel="noopener">Button Generator</a></h5><p>一个能在线快速设计出需要的css button样式的网站</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;平时在折腾各种工具的过程中总会发现各种各样有趣的网站（有些可能不一定很实用），有些可能比较冷门，所以特别用一篇文章来把这些网站整理一下，以后有兴趣找的时候可以方便一些。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="工具" scheme="https://ho1messi.github.io/categories/%E5%B7%A5%E5%85%B7/"/>
+    
+    
+      <category term="实用工具" scheme="https://ho1messi.github.io/tags/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>字符串的KMP匹配算法</title>
+    <link href="https://ho1messi.github.io/2017/02/12/%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84KMP%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95/"/>
+    <id>https://ho1messi.github.io/2017/02/12/字符串的KMP匹配算法/</id>
+    <published>2017-02-12T14:35:11.000Z</published>
+    <updated>2019-05-20T10:12:58.117Z</updated>
+    
+    <content type="html"><![CDATA[<p>在一个主串长为m，模式串长为n的匹配问题中，采用简单的匹配算法有着O(m * n)的时间复杂度。但是其中存在部分字符重复匹配。如果我们能够有效减少其中的重复匹配的现象，便能够将时间复杂度降低到O(m + n)，这无疑对提高模式匹配的速度十分有效。本文以考研复习时对《数据结构》一书中相关介绍的理解为主，添加一些实例，旨在日后自己忘记能更快回忆起并理解，同时也供路过网友参考。<br><a id="more"></a></p><h2 id="普通匹配算法引起的思考"><a href="#普通匹配算法引起的思考" class="headerlink" title="普通匹配算法引起的思考"></a>普通匹配算法引起的思考</h2><h3 id="普通匹配算法"><a href="#普通匹配算法" class="headerlink" title="普通匹配算法"></a>普通匹配算法</h3><p>现在有一个”abcaaba”的字符串（主串），需要在其中查找（匹配）一个”aba”的子串（模式串）第一次出现的位置，那么我们可以想到如下方法：</p><center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/1.png" alt="p1" title="普通第一次匹配"></center><p>如图，我们发现在第一次匹配时模式串中最后一个字符’a’和主串中对应字符’c’不同，说明不匹配，还需要进行查找。为了不漏过任意一个字串，我们谨慎地将模式串向右移动一位，再次进行匹配：</p><center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/2.png" alt="p2" title="普通第二次匹配"></center><p>这次似乎更不走运了，第一个字符就不相同。我们需要再将模式串向右移动一个字符，继续匹配，直到：</p><center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/3.png" alt="p3" title="普通最后一次匹配"></center><p>哈，我们终于找到了它出现的位置。不过先别急着休息，我们先来回顾一下我们的方法吧。</p><p>在每一次匹配中，我们从模式串的第一个字符起，一个一个地向后比较，直到出现不同的字符或者比较完所有字符。若是比较完所有字符都相等那当然是说明我们找到了模式串的位置，若是出现了不同的字符，那么很遗憾，我们还需要将模式串向右移一位重新比较。</p><h3 id="对于特殊例子的改进"><a href="#对于特殊例子的改进" class="headerlink" title="对于特殊例子的改进"></a>对于特殊例子的改进</h3><p>这个方法比较关键的一点在于，每次匹配失败后就要把模式串右移一位再重新比较。我们来详细研究一下第一次匹配：</p><center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/4.png" alt="p4" title="普通第一次匹配2"></center><p>毫无疑问主串和模式串的前两个字符完全相等，作为智慧生物我们可以一眼就看出来的。接下来我们在这里停住，做一点点小的推导：</p><blockquote><p>我们设主串的字符分别为S1、S2、…、Sm，模式串的字符则为T1、T2、…、Tn。由第一次匹配我们得到的结果是 S1 = T1、S2 = T2，同时我们观察模式串的前两个字符，很明显可以得到 T1 != T2（此处的 != 为不等于），那么结合一下我们就能得到 T1 != S2。</p></blockquote><p>等等，是不是觉得这个结果有点熟悉。对了，这正是我们第二次匹配的结果！</p><center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/2.png" alt="p2" title="普通第二次匹配"></center><p>这么说来只要加上简单的判断，我们就能减少许多像这样的匹配了。不过先别急，我们这里遇到的似乎只是一个特殊的情况，要让我们死板的计算机朋友也和我们这样取巧的话我们还需要找出一种更一般的方法。</p><h2 id="KMP匹配算法"><a href="#KMP匹配算法" class="headerlink" title="KMP匹配算法"></a>KMP匹配算法</h2><h3 id="寻找通用的方法"><a href="#寻找通用的方法" class="headerlink" title="寻找通用的方法"></a>寻找通用的方法</h3><p>打个比方说，假如我们有一个表（不妨叫做next表），能告诉计算机在模式串某一位的匹配中失败应该跳过下面的几次匹配，比如我们这个例子中就跳过了一次。或者采用更形象的描述，我们的模式串相对于主串向右多滑动了几个字符。因为按照我们上面的推导，似乎这个表里的数值只和模式串本身有关，那么我们便有信心使用某种算法在匹配之前就将这样的next表给计算出来，一次计算便可以造福后面的所有匹配。</p><center><img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/1.png" alt="p1" title="普通第一次匹配"> <img src="http://ol98d2692.bkt.clouddn.com/字符串的KMP匹配算法/5.png" alt="p5" title="普通第二次匹配2"></center><p>也就是说，只要我们有了这个next表，后面的匹配过程就能很轻易地实现了，我们就能很轻易地跳过很多次匹配了。我们只需要按照普通的方法那样匹配，唯一不同的在于，如果出现不匹配，我们不是“无脑”地将模式串向右滑动一个字符，而是借助一个next表“机智”地尽可能向右多滑动几个字符，以尽量减少计算机朋友判断的次数。</p><p>按照这个思路，我们可以很轻易写出对应的C语言代码：</p><pre><code>// S为主串，T为模式串，pos为从主串的第几位开始匹配// 下标都从1开始int Index_KMP(SString S, SString T, int pos){    // i为主串待匹配的字符位，j为模式串待匹配的字符位    int i = pos, j = 1;    // 下标0存储串的长度    while (i &lt;= S[0] &amp;&amp; j &lt;= T[0])    {        if (j == 0 || S[i] == T[j])        {            ++i;            ++j;        }        else        {            // next为参考的表，计算方法在后文            j = next[j];        }    }    // 匹配到模式串的最后则说明匹配成功    if (j &gt; T[0])        return i - T[0];    else        return 0;}</code></pre><p>这段代码是《数据结构》课本中的，有关的数据类型定义也能在书中找到。</p><p>现在看来似乎一切都很美好，唯一剩下的问题就是next表的计算了。</p><h3 id="计算next表"><a href="#计算next表" class="headerlink" title="计算next表"></a>计算next表</h3>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;在一个主串长为m，模式串长为n的匹配问题中，采用简单的匹配算法有着O(m * n)的时间复杂度。但是其中存在部分字符重复匹配。如果我们能够有效减少其中的重复匹配的现象，便能够将时间复杂度降低到O(m + n)，这无疑对提高模式匹配的速度十分有效。本文以考研复习时对《数据结构》一书中相关介绍的理解为主，添加一些实例，旨在日后自己忘记能更快回忆起并理解，同时也供路过网友参考。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="数据结构" scheme="https://ho1messi.github.io/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+    
+      <category term="数据结构" scheme="https://ho1messi.github.io/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"/>
+    
+      <category term="字符串" scheme="https://ho1messi.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
+    
+  </entry>
+  
+</feed>
